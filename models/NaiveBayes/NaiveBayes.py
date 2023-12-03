@@ -1,0 +1,2 @@
+class NaiveBayes():
+    pass
