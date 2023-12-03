@@ -1,3 +1,4 @@
 all_images/
-logs/
-split/
+all_labels/
+dataset/images/
+dataset/labels/
