@@ -32,11 +32,11 @@ nb_classifier = GaussianNB()
 nb_classifier.fit(validation_images, validation_labels)
 
 prediction = nb_classifier.predict(test_images)
-evaluate_model_performance(validation_labels, prediction)
+evaluate_model_performance(test_labels, prediction)
 
 # RandomForest
 rf_classifier = RandomForestClassifier()
 rf_classifier.fit(validation_images, validation_labels)
 
 prediction = rf_classifier.predict(test_images)
-evaluate_model_performance(validation_labels, prediction)
+evaluate_model_performance(test_labels, prediction)
