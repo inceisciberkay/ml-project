@@ -2,3 +2,4 @@ all_images/
 all_labels/
 dataset/images/
 dataset/labels/
+__pycache__/

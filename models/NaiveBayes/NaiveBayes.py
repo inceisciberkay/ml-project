@@ -1,2 +1,0 @@
-class NaiveBayes():
-    pass

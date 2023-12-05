@@ -1,2 +1,0 @@
-class Xception():
-    pass

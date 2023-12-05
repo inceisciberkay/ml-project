@@ -37,7 +37,6 @@ def split_csv():
     test_df.to_csv(test_csv_file_path, index=False)
 
 def create_subfolders():
-    # Read the CSV files
     train_df = pd.read_csv(train_csv_file_path)
     validation_df = pd.read_csv(validation_csv_file_path)
     test_df = pd.read_csv(test_csv_file_path)
@@ -80,8 +79,6 @@ def create_subfolders():
     copy_images_and_labels(train_df, train_images_folder_path, train_labels_folder_path)
     copy_images_and_labels(validation_df, validation_images_folder_path, validation_labels_folder_path)
     copy_images_and_labels(test_df, test_images_folder_path, test_labels_folder_path)
-
-    # print("Image directories organized for TensorFlow.")
 
 def main():
     split_csv()
