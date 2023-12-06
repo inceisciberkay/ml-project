@@ -7,7 +7,7 @@ test_images_dir = './dataset/images/test'
 
 class_names = ['nonfractured', 'fractured']
 
-BATCH_SIZE = 32
+BATCH_SIZE = 4
 IMG_SIZE = (224, 224)
 
 # data augmentation layer
