@@ -47,11 +47,11 @@ def get_dataset(split, in_memory=False):
      exit(1)
 
   if split == 'train':
-    dataset_generator = tf.keras.utils.image_dataset_from_directory(train_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, shuffle=False)
+    dataset_generator = tf.keras.utils.image_dataset_from_directory(train_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=42)
   elif split == 'validation':
-    dataset_generator = tf.keras.utils.image_dataset_from_directory(validation_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, shuffle=False)
+    dataset_generator = tf.keras.utils.image_dataset_from_directory(validation_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=42)
   else:
-    dataset_generator = tf.keras.utils.image_dataset_from_directory(test_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, shuffle=False)
+    dataset_generator = tf.keras.utils.image_dataset_from_directory(test_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=42)
 
   dataset_generator = process_dataset_generator(dataset_generator, augment=(split == 'train'))
 

@@ -35,7 +35,6 @@ model.compile(optimizer=Adam(learning_rate=base_learning_rate),
               metrics=[BinaryAccuracy(threshold=0, name='accuracy')])
 
 initial_epochs = 10
-loss0, accuracy0 = model.evaluate(validation_ds)
 
 history = model.fit(train_ds,
                     epochs=initial_epochs,
