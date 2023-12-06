@@ -4,3 +4,4 @@ dataset/images/
 dataset/labels/
 __pycache__/
 logs/
+.vscode/
