@@ -20,6 +20,7 @@ def evaluate_model_performance(groundtruth, prediction):
     print(classification_report(groundtruth, prediction))
 
 # kNN
+print('\n===========kNN===========\n')
 k_neighbors = 5
 knn_classifier = KNeighborsClassifier(n_neighbors=k_neighbors)
 knn_classifier.fit(train_images, train_labels)
@@ -28,6 +29,7 @@ prediction = knn_classifier.predict(test_images)
 evaluate_model_performance(test_labels, prediction)
 
 # NaiveBayes
+print('\n=======Naive Bayes=======\n')
 nb_classifier = GaussianNB()
 nb_classifier.fit(train_images, train_labels)
 
@@ -35,6 +37,7 @@ prediction = nb_classifier.predict(test_images)
 evaluate_model_performance(test_labels, prediction)
 
 # RandomForest
+print('\n======Random Forest======\n')
 rf_classifier = RandomForestClassifier()
 rf_classifier.fit(train_images, train_labels)
 

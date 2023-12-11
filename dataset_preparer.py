@@ -1,5 +1,12 @@
 import tensorflow as tf
 import numpy as np
+import random
+
+SEED = 42
+def seed_everything():
+  np.random.seed(SEED)
+  tf.random.set_seed(SEED)
+  random.seed(SEED)
 
 train_images_dir = './dataset/images/train'
 validation_images_dir = './dataset/images/validation'
@@ -12,8 +19,8 @@ IMG_SIZE = (224, 224)
 
 # data augmentation layer
 data_augmentation = tf.keras.Sequential([
-  tf.keras.layers.RandomFlip('horizontal'),
-  tf.keras.layers.RandomRotation(0.2),
+  tf.keras.layers.RandomFlip('horizontal', seed=SEED),
+  tf.keras.layers.RandomRotation(0.2, seed=SEED),
 ])
 
 rescale = tf.keras.applications.xception.preprocess_input   # between -1 and 1
@@ -45,15 +52,17 @@ def get_dataset(split, in_memory=False):
   if split != 'train' and split != 'validation' and split != 'test':
      print('Invalid split name. Possible splits are: train, validation, test')
      exit(1)
+    
+  seed_everything()
 
   if split == 'train':
-    dataset_generator = tf.keras.utils.image_dataset_from_directory(train_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=42)
+    dataset_generator = tf.keras.utils.image_dataset_from_directory(train_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=SEED)
   elif split == 'validation':
-    dataset_generator = tf.keras.utils.image_dataset_from_directory(validation_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=42)
+    dataset_generator = tf.keras.utils.image_dataset_from_directory(validation_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=SEED)
   else:
-    dataset_generator = tf.keras.utils.image_dataset_from_directory(test_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=42)
+    dataset_generator = tf.keras.utils.image_dataset_from_directory(test_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=SEED)
 
-  dataset_generator = process_dataset_generator(dataset_generator, augment=(split == 'train'))
+  dataset_generator = process_dataset_generator(dataset_generator, augment=(False)) # without augmentation models perform better
 
   if in_memory:
     return consume_dataset_generator(dataset_generator)
