@@ -32,7 +32,7 @@ def process_dataset_generator(ds_generator, augment=False):
     return ds_generator.prefetch(buffer_size=tf.data.AUTOTUNE)
 
 def consume_dataset_generator(dataset_generator):
-  images = np.concatenate(list(dataset_generator.map(lambda x, y: x)))
+  images = np.concatenate(list(dataset_generator.map(lambda x, y: tf.reduce_mean(x, axis=3))))  # collapse third dimension
   images = images.reshape(images.shape[0], -1)
 
   labels = np.concatenate(list(dataset_generator.map(lambda x, y: y)))
