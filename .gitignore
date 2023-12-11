@@ -1,5 +1,6 @@
 all_images/
 dataset/images/
+dataset/images2/
 dataset/labels/
 __pycache__/
 logs/

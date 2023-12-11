@@ -62,7 +62,7 @@ def get_dataset(split, in_memory=False):
   else:
     dataset_generator = tf.keras.utils.image_dataset_from_directory(test_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=SEED)
 
-  dataset_generator = process_dataset_generator(dataset_generator, augment=(False)) # without augmentation models perform better
+  dataset_generator = process_dataset_generator(dataset_generator, augment=(False)) # without augmentation models perform better (but the shapes of graphs are worse)
 
   if in_memory:
     return consume_dataset_generator(dataset_generator)
