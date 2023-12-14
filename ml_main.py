@@ -1,8 +1,9 @@
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from dataset_preparer import get_dataset
+from sklearn.model_selection import cross_val_score
+import numpy as np
 
 train_ds = get_dataset('train', in_memory=True)
 validation_ds = get_dataset('validation', in_memory=True)
@@ -19,27 +20,40 @@ def evaluate_model_performance(groundtruth, prediction):
     print("Classification Report:")
     print(classification_report(groundtruth, prediction))
 
-# kNN
-print('\n===========kNN===========\n')
-k_neighbors = 5
-knn_classifier = KNeighborsClassifier(n_neighbors=k_neighbors)
-knn_classifier.fit(train_images, train_labels)
-
-prediction = knn_classifier.predict(test_images)
-evaluate_model_performance(test_labels, prediction)
+# merge train and validation
+# train_images = np.concatenate((train_images, validation_images), axis=0)
+# train_labels = np.concatenate((train_labels, validation_labels), axis=0)
 
 # NaiveBayes
 print('\n=======Naive Bayes=======\n')
 nb_classifier = GaussianNB()
+
 nb_classifier.fit(train_images, train_labels)
+predictions = nb_classifier.predict(test_images)
+evaluate_model_performance(test_labels, predictions)
 
-prediction = nb_classifier.predict(test_images)
+# kNN
+# perform 4-fold cross validation to find the best k
+k_neighbors = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+k_scores = []
+for k in k_neighbors:
+    knn_classifier = KNeighborsClassifier(n_neighbors=k)
+    scores = cross_val_score(knn_classifier, train_images, train_labels, cv=4)
+    k_scores.append(np.mean(scores))
+print("4-fold cross validation scores: ", k_scores)
+best_k = k_neighbors[np.argmax(k_scores)]
+print("Best k: ", best_k)
+
+# use the best k to improve the accuracy
+knn_classifier = KNeighborsClassifier(n_neighbors=best_k)
+knn_classifier.fit(train_images, train_labels)
+prediction = knn_classifier.predict(test_images)
 evaluate_model_performance(test_labels, prediction)
 
-# RandomForest
-print('\n======Random Forest======\n')
-rf_classifier = RandomForestClassifier()
-rf_classifier.fit(train_images, train_labels)
+# # RandomForest
+# print('\n======Random Forest======\n')
+# rf_classifier = RandomForestClassifier()
+# rf_classifier.fit(train_images, train_labels)
 
-prediction = rf_classifier.predict(test_images)
-evaluate_model_performance(test_labels, prediction)
+# prediction = rf_classifier.predict(test_images)
+# evaluate_model_performance(test_labels, prediction)

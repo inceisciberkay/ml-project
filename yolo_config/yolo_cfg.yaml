@@ -1,0 +1,9 @@
+train: /home/inceisciberkay/cs464-project/project/dataset/images/train
+val: /home/inceisciberkay/cs464-project/project/dataset/images/validation
+test: /home/inceisciberkay/cs464-project/project/dataset/images/test
+
+# number of classes
+nc: 1
+
+# class names
+names: ["fractured"]
