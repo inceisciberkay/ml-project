@@ -61,7 +61,7 @@ outputs = Dense(1)(x)
 
 model = tf.keras.Model(inputs, outputs)
 
-model.compile(optimizer=Adam(learning_rate=0.1e-5), loss='binary_crossentropy', metrics=['accuracy'])
+model.compile(optimizer=Adam(learning_rate=0.1e-4), loss='binary_crossentropy', metrics=['accuracy'])
 
 # Training
 hist = model.fit(
