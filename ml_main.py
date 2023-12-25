@@ -1,9 +1,11 @@
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import confusion_matrix
 from dataset_preparer import get_dataset
 from sklearn.model_selection import cross_val_score
 import numpy as np
+from evaluation_utils import plot_confusion_matrix, calculate_evaluation_metrics
 
 train_ds = get_dataset('train', in_memory=True)
 validation_ds = get_dataset('validation', in_memory=True)
@@ -19,6 +21,20 @@ def evaluate_model_performance(groundtruth, prediction):
 
     print("Classification Report:")
     print(classification_report(groundtruth, prediction))
+    cm = confusion_matrix(groundtruth, prediction)
+    TP, FP, FN, TN = cm[0][0], cm[0][1], cm[1][0], cm[1][1]
+    accuracy, precision, recall, f1_score, f2_score = calculate_evaluation_metrics(TP, FP, FN, TN)
+    result = f"""\
+TP: {TP}, FP: {FP}, FN: {FN}, TN: {TN}
+Accuracy: {accuracy}
+Precision: {precision}
+Recall: {recall}
+F1 Score: {f1_score}
+F2 Score: {f2_score}
+"""
+    print("Evaluation Metrics:")
+    print(result)
+    plot_confusion_matrix(TP, FP, FN, TN)
 
 # merge train and validation
 # train_images = np.concatenate((train_images, validation_images), axis=0)
@@ -49,11 +65,3 @@ knn_classifier = KNeighborsClassifier(n_neighbors=best_k)
 knn_classifier.fit(train_images, train_labels)
 prediction = knn_classifier.predict(test_images)
 evaluate_model_performance(test_labels, prediction)
-
-# # RandomForest
-# print('\n======Random Forest======\n')
-# rf_classifier = RandomForestClassifier()
-# rf_classifier.fit(train_images, train_labels)
-
-# prediction = rf_classifier.predict(test_images)
-# evaluate_model_performance(test_labels, prediction)
