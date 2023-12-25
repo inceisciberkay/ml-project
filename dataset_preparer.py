@@ -17,23 +17,12 @@ class_names = ['nonfractured', 'fractured']
 BATCH_SIZE = 4
 IMG_SIZE = (224, 224)
 
-# data augmentation layer
-data_augmentation = tf.keras.Sequential([
-  tf.keras.layers.RandomFlip('horizontal', seed=SEED),
-  tf.keras.layers.RandomRotation(0.2, seed=SEED),
-])
-
 rescale = tf.keras.applications.xception.preprocess_input   # between -1 and 1
 
-def process_dataset_generator(ds_generator, augment=False):
+def process_dataset_generator(ds_generator):
     # Apply normalization to all datasets
     ds_generator = ds_generator.map(lambda x, y: (rescale(x), y), 
                 num_parallel_calls=tf.data.AUTOTUNE)
-    
-    # Use data augmentation only on the training set
-    if augment:
-        ds_generator = ds_generator.map(lambda x, y: (data_augmentation(x, training=True), y), 
-                    num_parallel_calls=tf.data.AUTOTUNE)
     
     # Use buffered prefetching on all datasets
     return ds_generator.prefetch(buffer_size=tf.data.AUTOTUNE)
@@ -62,7 +51,7 @@ def get_dataset(split, in_memory=False):
   else:
     dataset_generator = tf.keras.utils.image_dataset_from_directory(test_images_dir, label_mode='binary', class_names=class_names, image_size=IMG_SIZE, batch_size=BATCH_SIZE, seed=SEED)
 
-  dataset_generator = process_dataset_generator(dataset_generator, augment=(False)) # without augmentation models perform better (but the shapes of graphs are worse)
+  dataset_generator = process_dataset_generator(dataset_generator)
 
   if in_memory:
     return consume_dataset_generator(dataset_generator)
