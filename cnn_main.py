@@ -8,7 +8,7 @@ from keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from keras.losses import BinaryCrossentropy
 from keras.metrics import BinaryAccuracy, TruePositives, FalsePositives, TrueNegatives, FalseNegatives
 from dataset_preparer import get_dataset, IMG_SIZE
-from evaluation_utils import plot_confusion_matrix, print_evaluations
+from evaluation_utils import plot_confusion_matrix, calculate_evaluation_metrics
 
 def plot_history(history):
     # Plot training and validation loss
@@ -29,6 +29,22 @@ def plot_history(history):
     plt.legend()
     plt.show()
 
+def print_evaluations(title, TP, FP, FN, TN):
+    accuracy, precision, recall, f1_score, f2_score = calculate_evaluation_metrics(TP, FP, FN, TN)
+    with open('cnn_results.txt', "a+") as file:
+        result = f"""\
+{title}
+TP: {TP}, FP: {FP}, FN: {FN}, TN: {TN}
+Accuracy: {accuracy}
+Precision: {precision}
+Recall: {recall}
+F1 Score: {f1_score}
+F2 Score: {f2_score}
+
+"""
+        file.write(result)
+
+
 # Create callbacks
 class RemoveGarbageCallback(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
@@ -43,68 +59,68 @@ validation_ds = get_dataset('validation')
 test_ds = get_dataset('test')
 
 # # CASE 1
-# print('=============================== CASE 1 ===============================')
-# # Freeze the model and just train the top
-# base_model = Xception(input_shape=IMG_SHAPE, include_top=False, weights='imagenet', pooling='avg')
-# base_model.trainable = False
+print('=============================== CASE 1 ===============================')
+# Freeze the model and just train the top
+base_model = Xception(input_shape=IMG_SHAPE, include_top=False, weights='imagenet')
+base_model.trainable = False
 
-# inputs = tf.keras.Input(shape=IMG_SHAPE)
-# x = base_model(inputs, training=False)   # run base_model in inference mode
-# x = GlobalAveragePooling2D()(x)
-# x = Dense(256, activation='relu')(x)
-# x = Dropout(0.2)(x)  # Add dropout with a rate of 0.5 (adjust as needed)
-# x = Dense(128, activation='relu')(x)
-# x = Dense(16, activation='relu')(x)
-# outputs = Dense(1, activation='sigmoid')(x)
+inputs = tf.keras.Input(shape=IMG_SHAPE)
+x = base_model(inputs, training=False)   # run base_model in inference mode
+x = GlobalAveragePooling2D()(x)
+x = Dense(256, activation='relu')(x)
+x = Dropout(0.2)(x)  # Add dropout with a rate of 0.5 (adjust as needed)
+x = Dense(128, activation='relu')(x)
+x = Dense(16, activation='relu')(x)
+outputs = Dense(1, activation='sigmoid')(x)
 
-# model = tf.keras.Model(inputs, outputs)
+model = tf.keras.Model(inputs, outputs)
 
-# model.compile(optimizer=Adam(learning_rate=1e-4), loss=BinaryCrossentropy(), metrics=[BinaryAccuracy(), 
-#                                                                                       TruePositives(), 
-#                                                                                       FalsePositives(), 
-#                                                                                       FalseNegatives(),
-#                                                                                       TrueNegatives()])
+model.compile(optimizer=Adam(learning_rate=1e-4), loss=BinaryCrossentropy(), metrics=[BinaryAccuracy(), 
+                                                                                      TruePositives(), 
+                                                                                      FalsePositives(), 
+                                                                                      FalseNegatives(),
+                                                                                      TrueNegatives()])
 
-# # Train the model
-# hist = model.fit(
-#     train_ds,
-#     validation_data=validation_ds,
-#     epochs=15,
-#     callbacks=[RemoveGarbageCallback(), earlystop, reduce_lr]
-# )
+# Train the model
+hist = model.fit(
+    train_ds,
+    validation_data=validation_ds,
+    epochs=15,
+    callbacks=[RemoveGarbageCallback(), earlystop, reduce_lr]
+)
 
-# # Evaluate the model
-# test_loss, test_accuracy, TP, FP, FN, TN = model.evaluate(test_ds)
-# plot_history(hist.history)
-# plot_confusion_matrix(TP, FP, FN, TN)
-# print_evaluations(TP, FP, FN, TN)
+# Evaluate the model
+loss, acc, TP, FP, FN, TN = model.evaluate(validation_ds)
+plot_history(hist.history)
+plot_confusion_matrix(TP, FP, FN, TN)
+print_evaluations('CASE 1', TP, FP, FN, TN)
 
 # # CASE 2
-# print('=============================== CASE 2 ===============================')
-# # Freeze the model, train the top, unfreeze the model, retrain everything
-# # Unfreeze the model
-# model.trainable = True
+print('=============================== CASE 2 ===============================')
+# Freeze the model, train the top, unfreeze the model, retrain everything
+# Unfreeze the model
+model.trainable = True
 
-# # recompiling the model
-# model.compile(optimizer=Adam(learning_rate=1e-5), loss=BinaryCrossentropy(), metrics=[BinaryAccuracy(), 
-#                                                                                       TruePositives(), 
-#                                                                                       FalsePositives(), 
-#                                                                                       FalseNegatives(),
-#                                                                                       TrueNegatives()])
+# recompiling the model
+model.compile(optimizer=Adam(learning_rate=1e-5), loss=BinaryCrossentropy(), metrics=[BinaryAccuracy(), 
+                                                                                      TruePositives(), 
+                                                                                      FalsePositives(), 
+                                                                                      FalseNegatives(),
+                                                                                      TrueNegatives()])
 
-# # Train fine-tuned model
-# hist = model.fit(
-#     train_ds,
-#     validation_data=validation_ds,
-#     epochs=15,
-#     callbacks=[RemoveGarbageCallback(), earlystop, reduce_lr]
-# )
+# Train fine-tuned model
+hist = model.fit(
+    train_ds,
+    validation_data=validation_ds,
+    epochs=15,
+    callbacks=[RemoveGarbageCallback(), earlystop, reduce_lr]
+)
 
-# # Evaluate the model
-# test_loss, test_accuracy, TP, FP, FN, TN = model.evaluate(test_ds)
-# plot_history(hist.history)
-# plot_confusion_matrix(TP, FP, FN, TN)
-# print_evaluations(TP, FP, FN, TN)
+# Evaluate the model
+loss, acc, TP, FP, FN, TN = model.evaluate(validation_ds)
+plot_history(hist.history)
+plot_confusion_matrix(TP, FP, FN, TN)
+print_evaluations('CASE 2', TP, FP, FN, TN)
 
 # CASE 3
 print('=============================== CASE 3 ===============================')
@@ -147,7 +163,7 @@ hist = model.fit(
 )
 
 # Evaluate the model
-test_loss, test_accuracy, TP, FP, FN, TN = model.evaluate(test_ds)
+loss, acc, TP, FP, FN, TN = model.evaluate(validation_ds)
 plot_history(hist.history)
 plot_confusion_matrix(TP, FP, FN, TN)
-print_evaluations(TP, FP, FN, TN)
+print_evaluations('CASE 3', TP, FP, FN, TN)
