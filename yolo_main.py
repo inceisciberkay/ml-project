@@ -138,8 +138,19 @@ F2 Score: {f2_score}
         file.write(result)
 
 # Get test result of the best detect model
-
-
+best = 'runs/detect/train8'
+TP, FP, FN, TN = evaluate_detect_model(best, 'test')
+accuracy, precision, recall, f1_score, f2_score = calculate_evaluation_metrics(TP, FP, FN, TN)
+plot_confusion_matrix(TP, FP, FN, TN)
+result = f"""\
+TP: {TP}, FP: {FP}, FN: {FN}, TN: {TN}
+Accuracy: {accuracy}
+Precision: {precision}
+Recall: {recall}
+F1 Score: {f1_score}
+F2 Score: {f2_score}
+"""
+print(result)
 
 # Get validation results of classify runs
 for run_path in classify_runs:
